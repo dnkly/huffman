@@ -1,15 +1,15 @@
 #pragma once
 
 #include <fstream>
-#include <array>
+#include <vector>
 
 class Huffman {
 private:
-    std::array<int, 256> freq;
+    std::vector<int> freq;
 
     void count_freq(std::istream& is);
 public:
-    Huffman(): freq({0}) {}
+    Huffman(): freq(128, 0) {}
 
     void encode(std::istream& is, std::ostream& os);
 };
