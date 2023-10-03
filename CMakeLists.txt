@@ -10,4 +10,5 @@ add_compile_options(-Wall -Wextra)
 add_executable(
   huffman
   src/main.cpp
+  src/huffman.cpp
 )
