@@ -11,4 +11,5 @@ add_executable(
   huffman
   src/main.cpp
   src/huffman.cpp
+  src/hufftree.cpp
 )

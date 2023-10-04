@@ -1,4 +1,5 @@
 #include "huffman.hpp"
+#include "hufftree.hpp"
 
 void Huffman::count_freq(std::istream& is) {
     char ch;
@@ -12,8 +13,12 @@ void Huffman::count_freq(std::istream& is) {
 void Huffman::encode(std::istream& is, std::ostream& os) {
     count_freq(is);
 
-    for (size_t i = 0; i < freq.size(); ++i) {
-        if (freq[i] == 0) continue;
-        os << "[" << static_cast<char>(i) << "]: " << freq[i] << std::endl;
+    HuffTree htree(freq);
+    auto code_table = htree.to_map();
+
+    for (auto [key, value] : code_table) {
+        os << "[" << key << "]  " << freq[key] << "  ";
+        for (auto b : value) os << b;
+        os << std::endl;
     }
 }
