@@ -7,9 +7,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_compile_options(-Wall -Wextra)
 
+find_package(Boost 1.78 COMPONENTS program_options REQUIRED)
+
 add_executable(
   huffman
   src/main.cpp
   src/huffman.cpp
   src/hufftree.cpp
 )
+
+target_link_libraries(huffman Boost::program_options)
