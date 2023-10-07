@@ -12,6 +12,7 @@ int main(int argc, char* argv[]) {
     desc.add_options()
         ("help,h", "display help message")
         ("encode,e", "encode data")
+        ("decode,d", "decode data")
         ("file,f", po::value<std::string>(), "input file")
         ("output,o", po::value<std::string>(), "output file");
 
@@ -23,26 +24,33 @@ int main(int argc, char* argv[]) {
         po::store(po::command_line_parser(argc, argv).options(desc).positional(pos).run(), vm);
         po::notify(vm);
 
-        if (!vm.count("file")) {
+        bool incorrect_options = !vm.count("file")
+            || (vm.count("encode") && vm.count("decode"))
+            || (!vm.count("encode") && !vm.count("decode"));
+
+        if (incorrect_options) {
             std::cout << desc;
-            return 0;
+            return 1;
         }
 
         Huffman h;
         std::filesystem::path filepath(vm["file"].as<std::string>());
+        std::ifstream ifs(filepath, std::ios::binary);
+
+        if (!ifs.is_open())
+            throw std::system_error(errno, std::generic_category());
+
+        std::string extension = vm.count("encode") ? ".hff" : ".txt";
+        std::string output = vm.count("output")
+            ? vm["output"].as<std::string>()
+            : (filepath.parent_path() / filepath.stem()).string() + extension;
+
+        std::ofstream ofs(output, std::ios::binary);
 
         if (vm.count("encode")) {
-            std::ifstream ifs(vm["file"].as<std::string>(), std::ios::binary);
-
-            if (!ifs.is_open())
-                throw std::system_error(errno, std::generic_category());
-
-            std::string output = vm.count("output")
-                ? vm["output"].as<std::string>()
-                : (filepath.parent_path() / filepath.stem()).string() + ".hff";
-
-            std::ofstream ofs(output, std::ios::binary);
             h.encode(ifs, ofs);
+        } else {
+            h.decode(ifs, ofs);
         }
     } catch (std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
