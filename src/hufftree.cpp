@@ -11,7 +11,7 @@ void HuffTree::build_tree(const std::vector<int>& freq) {
     std::priority_queue<std::shared_ptr<Node>,
         std::vector<std::shared_ptr<Node>>, decltype(cmp)> p_queue(cmp);
 
-    for (size_t i = 0; i < freq.size(); ++i) {
+    for (uint8_t i = 0; i < freq.size(); ++i) {
         if (freq[i] == 0) continue;
         p_queue.push(std::make_shared<Node>(i, freq[i]));
     }
@@ -62,4 +62,14 @@ std::map<char, std::vector<bool>> HuffTree::to_map() const {
     }
 
     return code_table;
+}
+
+char HuffTree::next(bool b) {
+    current_ = b ? current_->right_ : current_->left_;
+    char ch = current_->ch_;
+
+    if (ch != 0)
+        current_ = root_;
+
+    return ch;
 }
