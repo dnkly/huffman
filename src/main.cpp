@@ -40,7 +40,18 @@ int main(int argc, char* argv[]) {
         if (!ifs.is_open())
             throw std::system_error(errno, std::generic_category());
 
-        std::string extension = vm.count("encode") ? ".hff" : ".txt";
+        std::string extension;
+
+        if (vm.count("encode")) {
+            extension = ".hff";
+        } else {
+            uint8_t extension_length;
+            ifs.read(reinterpret_cast<char*>(&extension_length), sizeof(char));
+
+            extension.resize(extension_length);
+            ifs.read(extension.data(), extension_length);
+        }
+
         std::string output = vm.count("output")
             ? vm["output"].as<std::string>()
             : (filepath.parent_path() / filepath.stem()).string() + extension;
@@ -48,6 +59,12 @@ int main(int argc, char* argv[]) {
         std::ofstream ofs(output, std::ios::binary);
 
         if (vm.count("encode")) {
+            extension = filepath.extension().string();
+            uint8_t extension_length = extension.size();
+
+            ofs.write(reinterpret_cast<char*>(&extension_length), sizeof(char));
+            ofs.write(extension.c_str(), extension_length);
+
             h.encode(ifs, ofs);
         } else {
             h.decode(ifs, ofs);
