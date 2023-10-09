@@ -12,4 +12,5 @@ public:
     Huffman(): freq_(128, 0) {}
 
     void encode(std::istream& is, std::ostream& os);
+    void decode(std::istream& is, std::ostream& os);
 };
